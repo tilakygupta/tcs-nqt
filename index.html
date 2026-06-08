@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TCS NQT Priority — Coding Questions | tilakygupta</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #111118;
+  --surface2: #18181f;
+  --border: #2a2a35;
+  --border2: #3a3a48;
+  --accent: #00e5a0;
+  --accent2: #7c6cff;
+  --warn: #ffb340;
+  --danger: #ff5f5f;
+  --text: #f0f0f8;
+  --muted: #888899;
+  --muted2: #555566;
+  --font-head: 'Syne', sans-serif;
+  --font-code: 'JetBrains Mono', monospace;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-code); min-height: 100vh; overflow-x: hidden; }
+
+/* GRID BG */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: linear-gradient(rgba(0,229,160,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,160,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none; z-index: 0;
+}
+
+/* HEADER */
+header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10,10,15,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 56px;
+}
+.logo { font-family: var(--font-head); font-size: 15px; font-weight: 800; letter-spacing: -0.5px; }
+.logo span { color: var(--accent); }
+.header-meta { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 16px; }
+.header-meta a { color: var(--accent2); text-decoration: none; font-size: 12px; }
+.header-meta a:hover { color: var(--accent); }
+
+/* HERO */
+.hero {
+  position: relative; z-index: 1;
+  padding: 5rem 2rem 3rem;
+  max-width: 960px; margin: 0 auto;
+}
+.hero-tag { font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 1rem; }
+.hero h1 { font-family: var(--font-head); font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; line-height: 1.1; letter-spacing: -1.5px; margin-bottom: 1rem; }
+.hero h1 em { color: var(--accent); font-style: normal; }
+.hero-sub { font-size: 14px; color: var(--muted); line-height: 1.8; max-width: 520px; margin-bottom: 2.5rem; }
+
+/* STATS ROW */
+.stats { display: flex; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 2.5rem; flex-wrap: wrap; }
+.stat { flex: 1; min-width: 100px; background: var(--surface); padding: 1.25rem 1.5rem; }
+.stat-val { font-family: var(--font-head); font-size: 28px; font-weight: 800; color: var(--accent); line-height: 1; }
+.stat-lbl { font-size: 11px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+
+/* PROGRESS */
+.prog-wrap { margin-bottom: 1rem; }
+.prog-header { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+.prog-bar { height: 3px; background: var(--border2); border-radius: 2px; }
+.prog-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 2px; transition: width 0.5s ease; }
+
+/* FILTERS */
+.controls { position: relative; z-index: 1; max-width: 960px; margin: 0 auto 1.5rem; padding: 0 2rem; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.flbl { font-size: 11px; color: var(--muted2); text-transform: uppercase; letter-spacing: 1px; }
+.ftab { padding: 5px 14px; border-radius: 20px; border: 1px solid var(--border2); font-size: 12px; font-family: var(--font-code); cursor: pointer; color: var(--muted); background: transparent; transition: all 0.15s; }
+.ftab:hover { border-color: var(--accent2); color: var(--text); }
+.ftab.active { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 700; }
+.search-wrap { margin-left: auto; }
+.search-wrap input { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 5px 12px; font-size: 12px; font-family: var(--font-code); color: var(--text); width: 200px; }
+.search-wrap input:focus { outline: none; border-color: var(--accent2); }
+.search-wrap input::placeholder { color: var(--muted2); }
+
+/* MAIN */
+main { position: relative; z-index: 1; max-width: 960px; margin: 0 auto; padding: 0 2rem 4rem; }
+
+/* CARD */
+.qcard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.qcard:hover { border-color: var(--border2); }
+.qcard.solved { border-color: rgba(0,229,160,0.4); }
+.qcard.has-bug { border-color: rgba(255,95,95,0.3); }
+
+.card-header { padding: 1rem 1.25rem; cursor: pointer; display: flex; align-items: flex-start; gap: 12px; }
+.card-header:hover { background: rgba(255,255,255,0.02); }
+.qno-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--muted); flex-shrink: 0; font-family: var(--font-head); }
+.qno-box.solved { background: rgba(0,229,160,0.15); border-color: var(--accent); color: var(--accent); }
+.card-info { flex: 1; min-width: 0; }
+.card-title { font-family: var(--font-head); font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 6px; letter-spacing: -0.3px; }
+.badges { display: flex; gap: 5px; flex-wrap: wrap; }
+.badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.b-easy { background: rgba(0,229,160,0.12); color: var(--accent); border: 1px solid rgba(0,229,160,0.25); }
+.b-medium { background: rgba(255,179,64,0.12); color: var(--warn); border: 1px solid rgba(255,179,64,0.25); }
+.b-hard { background: rgba(255,95,95,0.12); color: var(--danger); border: 1px solid rgba(255,95,95,0.25); }
+.b-topic { background: rgba(124,108,255,0.12); color: var(--accent2); border: 1px solid rgba(124,108,255,0.25); }
+.b-real { background: rgba(100,180,255,0.1); color: #64b4ff; border: 1px solid rgba(100,180,255,0.2); }
+.b-bug { background: rgba(255,95,95,0.1); color: var(--danger); border: 1px solid rgba(255,95,95,0.2); }
+.b-solved { background: rgba(0,229,160,0.1); color: var(--accent); border: 1px solid rgba(0,229,160,0.2); }
+.chevron { color: var(--muted2); font-size: 16px; margin-left: auto; flex-shrink: 0; transition: transform 0.2s; align-self: center; }
+.chevron.open { transform: rotate(180deg); }
+
+/* BODY */
+.card-body { display: none; border-top: 1px solid var(--border); }
+.card-body.open { display: block; }
+.section { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); }
+.section:last-child { border-bottom: none; }
+.sec-label { font-size: 10px; font-weight: 700; color: var(--muted2); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; }
+.story-text { font-size: 13px; color: var(--muted); line-height: 1.8; }
+
+.io-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+@media(max-width:600px) { .io-grid { grid-template-columns: 1fr; } }
+.io-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+.io-box pre { font-family: var(--font-code); font-size: 12px; color: var(--text); white-space: pre-wrap; line-height: 1.6; }
+
+/* CODE */
+.code-wrap { background: #0d0d14; border-radius: 8px; border: 1px solid var(--border); overflow: hidden; }
+.code-topbar { background: var(--surface2); padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+.code-dots { display: flex; gap: 5px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; }
+.d1 { background: #ff5f57; } .d2 { background: #febc2e; } .d3 { background: #28c840; }
+.code-filename { font-size: 11px; color: var(--muted); }
+.copy-btn { font-size: 11px; font-family: var(--font-code); padding: 3px 10px; border: 1px solid var(--border2); border-radius: 4px; background: transparent; color: var(--muted); cursor: pointer; transition: all 0.15s; }
+.copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+.copy-btn.copied { border-color: var(--accent); color: var(--accent); }
+.code-block { padding: 14px; font-family: var(--font-code); font-size: 12.5px; line-height: 1.7; overflow-x: auto; white-space: pre; }
+
+/* SYNTAX */
+.kw { color: #ff79c6; } .fn { color: #50fa7b; } .st { color: #f1fa8c; }
+.cm { color: #6272a4; font-style: italic; } .num { color: #bd93f9; }
+.bi { color: #8be9fd; }
+
+/* BUG NOTICE */
+.bug-notice { background: rgba(255,95,95,0.07); border: 1px solid rgba(255,95,95,0.2); border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #ff9090; line-height: 1.7; }
+.bug-notice strong { color: var(--danger); }
+
+/* FIX */
+.fix-box { background: rgba(0,229,160,0.05); border: 1px solid rgba(0,229,160,0.15); border-radius: 8px; padding: 10px 14px; }
+.fix-box .sec-label { color: rgba(0,229,160,0.6); }
+
+/* EDGES */
+.edge-list { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.edge-list li { font-size: 12px; color: var(--muted); line-height: 1.6; padding-left: 14px; position: relative; }
+.edge-list li::before { content: '⚠'; position: absolute; left: 0; font-size: 10px; }
+
+/* LOGIC TIP */
+.logic-tip { font-size: 12.5px; color: var(--muted); line-height: 1.8; }
+.logic-tip code { font-family: var(--font-code); font-size: 12px; background: var(--surface2); padding: 1px 5px; border-radius: 3px; color: var(--accent2); }
+
+/* FOOTER */
+footer { position: relative; z-index: 1; border-top: 1px solid var(--border); padding: 2rem; text-align: center; font-size: 12px; color: var(--muted2); }
+footer a { color: var(--accent); text-decoration: none; }
+
+/* EMPTY */
+.empty { text-align: center; padding: 4rem 2rem; color: var(--muted2); font-size: 13px; }
+
+/* SCROLL TOP */
+.scroll-top { position: fixed; bottom: 24px; right: 24px; z-index: 200; background: var(--accent); color: #000; width: 36px; height: 36px; border-radius: 50%; border: none; cursor: pointer; font-size: 16px; display: none; align-items: center; justify-content: center; transition: transform 0.2s; }
+.scroll-top:hover { transform: scale(1.1); }
+.scroll-top.show { display: flex; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">TCS<span>NQT</span>.dev</div>
+  <div class="header-meta">
+    <span id="hdr-count">21 questions</span>
+    <a href="https://github.com/tilakygupta/tcs-nqt" target="_blank">↗ tilakygupta/tcs-nqt</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-tag">TCS NQT Priority Exam</div>
+  <h1>Coding Questions<br><em>Solved in Python</em></h1>
+  <p class="hero-sub">All questions from the actual TCS NQT Priority exam. Real problem statements, Python solutions, edge cases, and bug fixes — sourced directly from the repo.</p>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-val">21</div><div class="stat-lbl">Total Questions</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--accent)">14</div><div class="stat-lbl">Easy</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--warn)">5</div><div class="stat-lbl">Medium</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--danger)">2</div><div class="stat-lbl">Hard</div></div>
+    <div class="stat"><div class="stat-val" id="solved-count" style="color:var(--accent2)">0</div><div class="stat-lbl">Solved</div></div>
+  </div>
+
+  <div class="prog-wrap">
+    <div class="prog-header"><span>Progress</span><span id="prog-lbl">0 / 21</span></div>
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+</section>
+
+<div class="controls">
+  <span class="flbl">Filter:</span>
+  <button class="ftab active" onclick="setFilter('all',this)">All (21)</button>
+  <button class="ftab" onclick="setFilter('easy',this)">Easy</button>
+  <button class="ftab" onclick="setFilter('medium',this)">Medium</button>
+  <button class="ftab" onclick="setFilter('hard',this)">Hard</button>
+  <button class="ftab" onclick="setFilter('bug',this)">Has Bug Fix</button>
+  <div class="search-wrap">
+    <input type="text" id="search" placeholder="Search questions..." oninput="searchQs(this.value)">
+  </div>
+</div>
+
+<main id="qlist"></main>
+
+<footer>
+  Built by <a href="https://github.com/tilakygupta" target="_blank">tilakygupta</a> &nbsp;·&nbsp;
+  <a href="https://github.com/tilakygupta/tcs-nqt" target="_blank">GitHub Repo</a> &nbsp;·&nbsp;
+  TCS NQT Priority Exam Preparation
+</footer>
+
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+const qs = [
+{id:1, diff:"easy", topic:"Numbers", exam:"Repeated", file:"armstrong.py", hasBug:false,
+ title:"Armstrong Number Checker",
+ story:"A factory quality system checks if a batch code (number) is an 'Armstrong number' — the sum of each digit raised to the power of the number of digits equals the number itself. Example: 153 = 1³+5³+3³ = 153.",
+ inp:"153",out:"The string 153 is a Armstrong",
+ edges:["Single digit: always Armstrong (e.g. 5 = 5¹ = 5)","n=0 or negative: handle gracefully","4-digit: 1634 = 1⁴+6⁴+3⁴+4⁴ = 1634"],
+ code:`n = int(input())
+
+temp = n
+digits = len(str(n))
+s = 0
+
+while temp:
+    rem = temp % 10
+    s += rem ** digits
+    temp //= 10
+
+if s == n:
+    print(f"The string {n} is a Armstrong")
+else:
+    print(f"The string {n} is not a Armstrong")`,
+ logic:"Extract each digit using <code>% 10</code>, raise to power = number of digits. Sum and compare. The <code>while temp</code> loop extracts digits from right to left."
+},
+{id:2, diff:"easy", topic:"Factory", exam:"Oct 2024", file:"biscuit.py", hasBug:false,
+ title:"Biscuit Factory — Pack Boxes",
+ story:"A biscuit factory makes N biscuits. Each box holds exactly K biscuits. Print how many full boxes are packed and how many biscuits are left over.",
+ inp:"23 5",out:"4\n3",
+ edges:["N=0: 0 boxes, 0 leftover","K > N: 0 boxes, N leftover","N exactly divisible: leftover = 0"],
+ code:`n, k = map(int, input().split())
+
+full = n // k
+left = n % k
+
+print(full)
+print(left)`,
+ logic:"Integer division <code>//</code> gives full boxes. Modulo <code>%</code> gives leftover. Simplest possible solution — TCS Q1 style."
+},
+{id:3, diff:"easy", topic:"Retail", exam:"Oct 2024", file:"bookstore.py", hasBug:false,
+ title:"Bookstore — Most Expensive Book",
+ story:"A bookstore has N books with their titles and prices. Find the most expensive book. If two books share the highest price, print the first one encountered.",
+ inp:"4\nPython 450\nDSA 780\nOS 780\nCN 500",out:"Most expensive: DSA at ₹780",
+ edges:["N=1: print that book","All same price: print first","Price = 0: valid input"],
+ code:`n = int(input())
+
+max_title = ""
+max_price = -1
+
+for _ in range(n):
+    title, price = input().split()
+    price = int(price)
+
+    if price > max_price:
+        max_title = title
+        max_price = price
+
+print(f"Most expensive: {max_title} at ₹{max_price}")`,
+ logic:"Strict <code>></code> ensures first occurrence wins on tie. Initialise <code>max_price = -1</code> to handle any positive prices correctly."
+},
+{id:4, diff:"easy", topic:"Numbers", exam:"Repeated", file:"checkprime.py", hasBug:false,
+ title:"Prime Number Checker",
+ story:"A security system uses prime numbers as encryption keys. Given a number N, check if it is prime.",
+ inp:"17",out:"Prime",
+ edges:["N < 2: Not prime (includes 0,1)","N = 2: Prime","Even numbers > 2: Not prime"],
+ code:`n = int(input("Enter a number: "))
+
+if n < 2:
+    print("Not prime")
+else:
+    for i in range(2, int(n**0.5)+1):
+        if n % i == 0:
+            print("Not prime")
+            break
+    else:
+        print("Prime")`,
+ logic:"Only check up to √n — if no divisor found, it's prime. The <code>for...else</code> trick: the <code>else</code> runs only if the loop completes without a <code>break</code>."
+},
+{id:5, diff:"medium", topic:"Factory", exam:"Oct 2024 Real", file:"chocolate.py", hasBug:false,
+ title:"Chocolate Factory — Move Empty Packets",
+ story:"A chocolate factory conveyor belt is represented as an array. 0 means an empty slot. Move all empty slots (0s) to the end without changing the order of filled packets.",
+ inp:"8\n4 5 0 1 9 0 5 0",out:"4 5 1 9 5 0 0 0",
+ edges:["All zeros: stays all zeros","No zeros: array unchanged","Single element: output same"],
+ code:`n = int(input())
+
+arr = list(map(int, input().split()))
+
+pos = 0
+
+for i in range(n):
+    if arr[i] != 0:
+        arr[pos] = arr[i]
+        pos += 1
+
+while pos < n:
+    arr[pos] = 0
+    pos += 1
+
+print(*arr)`,
+ logic:"Two-pass approach: first pass copies all non-zeros to the front using a <code>pos</code> pointer. Second pass fills remaining positions with 0. O(n) time, O(1) space."
+},
+{id:6, diff:"easy", topic:"Retail", exam:"Oct 2024", file:"discount.py", hasBug:false,
+ title:"Supermarket — Apply Discount",
+ story:"A supermarket offers tiered discounts: 0% for under ₹500, 10% for ₹500–₹999, 20% for ₹1000 and above. Print the final bill amount.",
+ inp:"1200",out:"Final Amount: ₹960.0",
+ edges:["bill = 0 or negative: Invalid amount","Exactly ₹500: 10% off","Exactly ₹1000: 20% off"],
+ code:`bill = float(input())
+
+if bill <= 0:
+    print("Invalid amount")
+elif bill < 500:
+    discount = 0
+elif bill < 1000:
+    discount = 0.10
+else:
+    discount = 0.20
+
+if bill > 0:
+    final = bill * (1 - discount)
+    print(f"Final Amount: ₹{final}")`,
+ logic:"<code>elif</code> ladder handles tiers cleanly. Boundary: ₹500 falls in the 10% bracket (<code>elif bill < 1000</code> catches it). Validate before computing."
+},
+{id:7, diff:"easy", topic:"Math", exam:"Repeated", file:"factorial.py", hasBug:false,
+ title:"Factorial Calculator",
+ story:"A combinatorics library needs to compute N! (N factorial). Given N, print its factorial.",
+ inp:"6",out:"720",
+ edges:["N=0: 0! = 1","N=1: 1! = 1","Large N: Python handles big ints natively"],
+ code:`n = int(input())
+
+fact = 1
+for i in range(1, n+1):
+    fact *= i
+print(fact)`,
+ logic:"Iterative approach starting from 1. Python handles arbitrarily large integers — no overflow unlike C/Java. <code>range(1, n+1)</code> includes n."
+},
+{id:8, diff:"easy", topic:"Series", exam:"Repeated", file:"fibonacci.py", hasBug:false,
+ title:"Fibonacci Series — First N Terms",
+ story:"A pattern generator needs the first N terms of the Fibonacci sequence (starting 0, 1, 1, 2, 3, 5...).",
+ inp:"7",out:"0 1 1 2 3 5 8",
+ edges:["N=0: print nothing","N=1: print 0 only","N=2: print 0 1"],
+ code:`n = int(input("Enter a number: "))
+
+a, b = 0, 1
+
+for i in range(n):
+    print(a, end=" ")
+    a, b = b, a+b`,
+ logic:"Swap trick: <code>a, b = b, a+b</code> simultaneously updates both values. <code>end=\" \"</code> keeps all output on one line. Clean and O(n)."
+},
+{id:9, diff:"easy", topic:"Strings", exam:"Oct 2024 Real", file:"frequency.py", hasBug:false,
+ title:"Inventory Frequency Counter",
+ story:"A warehouse manager gets a space-separated list of item names. Count how many times each item appears. If any digit is found in the input, print 'Invalid Input'.",
+ inp:"apple banana apple mango banana apple",out:"apple 3\nbanana 2\nmango 1",
+ edges:["Digit in any word: Invalid Input","Single item: count = 1","Mixed case: treated differently ('Apple' ≠ 'apple')"],
+ code:`items = input().split()
+
+for item in items:
+    if any(ch.isdigit() for ch in item):
+        print("Invalid Input")
+        exit()
+
+freq = {}
+
+for item in items:
+    freq[item] = freq.get(item, 0) + 1
+
+for item in freq:
+    print(item, freq[item])`,
+ logic:"Validate first using <code>any(ch.isdigit() ...)</code> — call <code>exit()</code> immediately on failure. Use dict <code>.get(key, 0)</code> to safely increment counts."
+},
+{id:10, diff:"medium", topic:"Finance", exam:"Repeated", file:"gst.py", hasBug:false,
+ title:"E-commerce Cart — GST & Promo Code",
+ story:"An online store computes bill with 18% GST. If promo code 'SAVE10' is entered, apply 10% discount on subtotal before GST. Print the full bill breakdown.",
+ inp:"3\n200 450 150\nSAVE10",out:"Subtotal: ₹800\nAfter promo: ₹720.0\nGST (18%): ₹129.6\nTotal: ₹849.6",
+ edges:["No promo code: skip discount","Invalid promo: treat as no discount","N=0: subtotal = 0","Order matters: discount first, then GST"],
+ code:`n = int(input())
+
+prices = list(map(int, input().split()))
+
+promo = input().strip()
+
+subtotal = sum(prices)
+
+print(f"Subtotal: ₹{subtotal}")
+
+if promo == "SAVE10":
+    after_promo = subtotal * 0.90
+else:
+    after_promo = subtotal
+
+print(f"After promo: ₹{after_promo}")
+
+gst = after_promo * 0.18
+
+print(f"GST (18%): ₹{gst}")
+
+total = after_promo + gst
+
+print(f"Total: ₹{total}")`,
+ logic:"Discount applies to subtotal, GST applies to discounted price — order matters. Use <code>.strip()</code> on promo input to avoid whitespace bugs."
+},
+{id:11, diff:"easy", topic:"Math", exam:"Repeated", file:"integer.py", hasBug:false,
+ title:"Digit Properties — Count, Sum, Product",
+ story:"Given a number N, compute in one pass: count of digits, sum of digits, and product of digits. Print all three.",
+ inp:"12345",out:"5\n15\n120",
+ edges:["N containing 0: product becomes 0","Single digit: count=1","Input as string recommended for leading zeros"],
+ code:`num = int(input())
+
+count = 0
+sums = 0
+product = 1
+
+temp = num
+
+while temp > 0:
+    digit = temp % 10
+    count += 1
+    sums += digit
+    product *= digit
+    temp //= 10
+
+print(count)
+print(sums)
+print(product)`,
+ logic:"Single loop extracts each digit using <code>% 10</code>, then chops it off with <code>// 10</code>. Track all 3 accumulators simultaneously."
+},
+{id:12, diff:"easy", topic:"Numbers", exam:"Repeated", file:"leapyear.py", hasBug:false,
+ title:"Leap Year Checker",
+ story:"Given a year, determine if it is a leap year. Leap year rule: divisible by 4, BUT century years (÷100) must also be divisible by 400.",
+ inp:"2024",out:"leap year",
+ edges:["1900: NOT leap year (÷100 but not ÷400)","2000: IS leap year (÷400)","2100: NOT leap year","2024: IS leap year"],
+ code:`data = int(input())
+
+if data % 4 == 0 and data % 100 != 0 or data % 400 == 0:
+    print("leap year")
+else:
+    print("not leap year")`,
+ logic:"Full rule: <code>(divisible by 4 AND NOT by 100) OR divisible by 400</code>. The <code>and</code> has higher precedence than <code>or</code>, so the logic is correct as written."
+},
+{id:13, diff:"medium", topic:"Arrays", exam:"Repeated", file:"missingnum.py", hasBug:true,
+ bugNote:"The original missingnum.py in the repo is INCOMPLETE — the function body is empty after the data check. Fixed version below uses the formula approach.",
+ title:"Find the Missing Number",
+ story:"Given an array of N-1 distinct integers from 1 to N, find the one missing number. Classic TCS exam question.",
+ inp:"6\n1 2 4 5 6",out:"3",
+ edges:["Missing number is N itself","Missing number is 1","Single element missing from [1,2]"],
+ fixCode:`n = int(input())
+arr = list(map(int, input().split()))
+
+# Formula: sum of 1..N minus actual sum
+expected = n * (n + 1) // 2
+missing = expected - sum(arr)
+print(missing)`,
+ code:`import sys
+
+def missing():
+    data = sys.stdin.read().split()
+
+    if not data:
+        return
+
+    # BUG: function body is incomplete in original repo`,
+ logic:"Formula: sum of 1..N = N*(N+1)/2. Subtract actual array sum. The difference is the missing number. O(n) time, O(1) space."
+},
+{id:14, diff:"easy", topic:"Strings", exam:"Oct 2024 Real", file:"palindrome.py", hasBug:false,
+ title:"Palindrome Checker",
+ story:"Given a string, check if it reads the same forwards and backwards. Print whether it is a palindrome.",
+ inp:"racecar",out:"The string racecar is Palindrome",
+ edges:["Empty string: palindrome","Single char: palindrome","Mixed case: 'Racecar' ≠ 'racecar' (case sensitive)","Numbers as strings: '121' is palindrome"],
+ code:`n = input("Enter a string: ")
+
+reverse = n[::-1]
+
+if n == reverse:
+    print(f"The string {n} is Palindrome")
+else:
+    print("Not Palindrome")`,
+ logic:"<code>n[::-1]</code> is Python's cleanest string reversal — slice with step -1. Direct comparison handles all cases."
+},
+{id:15, diff:"easy", topic:"Math", exam:"Oct 2024 Real", file:"prblm1.py", hasBug:true,
+ bugNote:"Original code prints average BEFORE total, and uses sys.stdin instead of clean input(). Output order doesn't match TCS expected format.",
+ title:"Weekly Exercise Summary",
+ story:"A fitness app feature: take exercise minutes for 7 days. Print total first, then average (rounded to nearest integer). This was Q1 of Oct 3 2024 morning shift.",
+ inp:"45 15 30 15 5 10 20",out:"Total exercise duration : 140 (minutes)\nAverage daily exercise duration: 20 minutes",
+ edges:["All zeros: total=0, avg=0","Float inputs: use round()","Exactly 7 values required"],
+ fixCode:`durations = list(map(int, input().split()))
+
+total = sum(durations)
+avg = round(total / 7)
+
+print(f"Total exercise duration : {total} (minutes)")
+print(f"Average daily exercise duration: {avg} minutes")`,
+ code:`import sys
+
+raw_data = sys.stdin.read().split()
+
+data = [float(x) for x in raw_data]
+if data:
+    avg = sum(data)/len(data)
+    print(avg)  # BUG: prints avg BEFORE total
+
+total = sum(data)
+print(total)   # BUG: total printed second`,
+ logic:"Use <code>round()</code> for average. Print total first, average second — TCS does exact output matching. Clean <code>input().split()</code> is preferred over sys.stdin."
+},
+{id:16, diff:"easy", topic:"Numbers", exam:"Oct 2024 Real", file:"prblm2.py", hasBug:false,
+ title:"Palindrome Count in Range [M, N]",
+ story:"Given a range M to N inclusive, count how many integers are palindromes. This was Q2 of Oct 3 2024 morning shift.",
+ inp:"10 20",out:"1",
+ edges:["M = N: check if that single number is palindrome","Large range: solution is O(n) but fast enough","Single digit range: all palindromes"],
+ code:`m, n = map(int, input().split())
+
+count = 0
+
+for i in range(m, n+1):
+    s = str(i)
+    if s == s[::-1]:
+        count += 1
+print(count)`,
+ logic:"Convert each number to string, compare with reverse. Between 10–20, only 11 qualifies. <code>range(m, n+1)</code> includes N."
+},
+{id:17, diff:"easy", topic:"Transport", exam:"Oct 2024 Real", file:"prblm3.py", hasBug:false,
+ title:"Train Travel Time",
+ story:"A train covers 800 metres (400m track + 400m bridge). Given speed in km/hr, calculate time taken in seconds. Print as integer.",
+ inp:"72",out:"40",
+ edges:["Speed must be positive","Result is integer (use int(), not round())","Very high speed: still outputs integer"],
+ code:`speed = int(input())
+
+distance = 800
+
+speed = speed * 5/18
+
+time = int(distance / speed)
+
+print(time)`,
+ logic:"Convert km/hr → m/s using × 5/18. Time = Distance ÷ Speed. 800 ÷ (72 × 5/18) = 800 ÷ 20 = 40 seconds. Use <code>int()</code> to truncate."
+},
+{id:18, diff:"easy", topic:"Transport", exam:"Oct 2024", file:"prblm4.py", hasBug:false,
+ title:"Speed Calculator (Distance ÷ Time)",
+ story:"Given time in seconds and fixed distance 1000 metres, calculate speed in km/hr.",
+ inp:"50",out:"72.0",
+ edges:["time = 0: division by zero — should handle","Very small time: large speed","Floating point input allowed"],
+ code:`time = float(input())
+
+distance = 1000
+
+speed = distance / time
+
+speed_km = speed * 3.6
+
+print(speed_km)`,
+ logic:"m/s → km/hr: multiply by 3.6 (same as × 18/5). 1000 ÷ 50 = 20 m/s → 20 × 3.6 = 72 km/hr."
+},
+{id:19, diff:"medium", topic:"Arrays", exam:"Repeated", file:"secondlargest.py", hasBug:true,
+ bugNote:"Critical bug: uses index [2] instead of [1] to get second largest. Index 0 = largest, index 1 = second largest. The code would crash or return wrong answer.",
+ title:"Second Largest Student Score",
+ story:"Given a list of student scores, find the second largest unique score. If no second unique score exists, print -1.",
+ inp:"85 92 78 92 65 85 99",out:"92",
+ edges:["All same: print -1","Only 2 unique values: second is the smaller one","N=1: print -1"],
+ fixCode:`arr = list(map(int, input().split()))
+
+unique = sorted(set(arr), reverse=True)
+
+if len(unique) < 2:
+    print(-1)
+else:
+    print(unique[1])  # FIX: index [1] not [2]`,
+ code:`def find_second_largest():
+    user_input = input("Enter student marks: ")
+    marks = [int(x) for x in user_input.split()]
+    unique_marks = list(set(marks))
+    if len(unique_marks) < 2:
+        print("-1")
+        return
+    unique_marks.sort(reverse=True)
+    print(unique_marks[2])  # BUG: should be [1] not [2]
+
+find_second_largest()`,
+ logic:"After sorting descending, index 0 = largest, index 1 = second largest. Using [2] would give third largest or raise IndexError."
+},
+{id:20, diff:"easy", topic:"Math", exam:"Repeated", file:"sum.py", hasBug:false,
+ title:"Sum of Integers in Range [M, N]",
+ story:"Given a range M to N inclusive, calculate the sum of all integers in that range using the arithmetic series formula.",
+ inp:"0 3",out:"6",
+ edges:["M = N: sum = that number","M > N: invalid (should handle)","Negative ranges: formula still works"],
+ code:`m, n = map(int, input().split())
+
+sum = (n - m + 1) * (m + n) // 2
+
+print(sum)`,
+ logic:"Arithmetic series formula: count × average = (n-m+1) × (m+n)/2. O(1) vs O(n) loop — critical for large ranges. Note: avoids using <code>sum</code> as variable name clash with built-in."
+},
+{id:21, diff:"easy", topic:"Factory", exam:"Oct 2024", file:"toy.py", hasBug:false,
+ title:"Toy Factory — Defect Rate",
+ story:"A toy factory produces N toys, Q are rejected. Find the defect percentage and print PASS (≤5%) or FAIL.",
+ inp:"200 8",out:"4.0\nPass",
+ edges:["N=0: division by zero — add guard","Q > N: invalid input","Exactly 5%: should be Pass (use <=)"],
+ code:`n, q = map(int, input().split())
+
+defect = (q/n) * 100
+
+print(defect)
+
+if defect <= 5:
+    print("Pass")
+else:
+    print("Fail")`,
+ logic:"Boundary: exactly 5% is PASS — use <code><=</code> not <code><</code>. The original code doesn't guard N=0 — add <code>if n == 0: print('Invalid')</code> for exam safety."
+}
+];
+
+let solved = new Set();
+let curFilter = 'all';
+let curSearch = '';
+
+function esc(s){ return s.replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function syntaxHL(code){
+  return esc(code)
+    .replace(/(#.*?)(?=\n|$)/g,'<span class="cm">$1</span>')
+    .replace(/\b(def|if|else|elif|for|while|in|return|import|from|and|or|not|True|False|None|break|continue|exit|pass|class|try|except|with|as|lambda|yield|del)\b/g,'<span class="kw">$1</span>')
+    .replace(/(["'])((?:(?!\1).)*)\1/g,'<span class="st">$1$2$1</span>')
+    .replace(/\b(\d+\.?\d*)\b/g,'<span class="num">$1</span>')
+    .replace(/\b(print|input|int|float|str|len|range|sum|list|map|set|sorted|round|any|all|min|max|abs)\b/g,'<span class="bi">$1</span>');
+}
+
+function copyCode(id){
+  const q = qs.find(q=>q.id===id);
+  const code = q.hasBug ? q.fixCode : q.code;
+  navigator.clipboard.writeText(code).then(()=>{
+    const btn = document.getElementById('copy-'+id);
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent='Copy'; btn.classList.remove('copied'); },2000);
+  });
+}
+
+function toggleCard(id){
+  const body = document.getElementById('body-'+id);
+  const chev = document.getElementById('chev-'+id);
+  const qno = document.getElementById('qno-'+id);
+  const open = body.classList.contains('open');
+  body.classList.toggle('open');
+  chev.classList.toggle('open');
+  if(!open){
+    solved.add(id);
+    qno.classList.add('solved');
+    document.getElementById('qc-'+id).classList.add('solved');
+    updateStats();
+  }
+}
+
+function updateStats(){
+  const n = solved.size;
+  document.getElementById('solved-count').textContent = n;
+  document.getElementById('prog-fill').style.width = Math.round(n/21*100)+'%';
+  document.getElementById('prog-lbl').textContent = n+' / 21';
+}
+
+function setFilter(f, btn){
+  curFilter = f;
+  document.querySelectorAll('.ftab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function searchQs(val){
+  curSearch = val.toLowerCase();
+  render();
+}
+
+function render(){
+  let filtered = qs.filter(q=>{
+    if(curFilter==='easy' && q.diff!=='easy') return false;
+    if(curFilter==='medium' && q.diff!=='medium') return false;
+    if(curFilter==='hard' && q.diff!=='hard') return false;
+    if(curFilter==='bug' && !q.hasBug) return false;
+    if(curSearch && !q.title.toLowerCase().includes(curSearch) && !q.topic.toLowerCase().includes(curSearch) && !q.story.toLowerCase().includes(curSearch)) return false;
+    return true;
+  });
+
+  const list = document.getElementById('qlist');
+  if(!filtered.length){
+    list.innerHTML = '<div class="empty">No questions match this filter.</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(q=>{
+    const displayCode = q.hasBug ? q.fixCode : q.code;
+    const isOpen = document.getElementById('body-'+q.id)?.classList.contains('open');
+    return `
+<div class="qcard${solved.has(q.id)?' solved':''}${q.hasBug?' has-bug':''}" id="qc-${q.id}">
+  <div class="card-header" onclick="toggleCard(${q.id})">
+    <div class="qno-box${solved.has(q.id)?' solved':''}" id="qno-${q.id}">${String(q.id).padStart(2,'0')}</div>
+    <div class="card-info">
+      <div class="card-title">${q.title}</div>
+      <div class="badges">
+        <span class="badge b-${q.diff}">${q.diff}</span>
+        <span class="badge b-topic">${q.topic}</span>
+        <span class="badge b-real">${q.file}</span>
+        ${q.hasBug?'<span class="badge b-bug">⚠ Bug Fixed</span>':''}
+        ${solved.has(q.id)?'<span class="badge b-solved">✓ Solved</span>':''}
+      </div>
+    </div>
+    <span class="chevron${isOpen?' open':''}" id="chev-${q.id}">▾</span>
+  </div>
+  <div class="card-body${isOpen?' open':''}" id="body-${q.id}">
+    <div class="section">
+      <div class="sec-label">Problem Statement</div>
+      <div class="story-text">${q.story}</div>
+    </div>
+    <div class="section">
+      <div class="sec-label">Example</div>
+      <div class="io-grid">
+        <div class="io-box"><div class="sec-label" style="margin-bottom:4px">Input</div><pre>${esc(q.inp)}</pre></div>
+        <div class="io-box"><div class="sec-label" style="margin-bottom:4px">Output</div><pre>${esc(q.out)}</pre></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="sec-label">Edge Cases</div>
+      <ul class="edge-list">${q.edges.map(e=>`<li>${e}</li>`).join('')}</ul>
+    </div>
+    ${q.hasBug?`
+    <div class="section">
+      <div class="bug-notice"><strong>Bug in repo (${q.file}):</strong> ${q.bugNote}</div>
+    </div>`:''}
+    <div class="section">
+      <div class="sec-label" style="margin-bottom:8px">${q.hasBug?'Fixed Python Solution':'Python Solution'}</div>
+      <div class="code-wrap">
+        <div class="code-topbar">
+          <div class="code-dots"><div class="dot d1"></div><div class="dot d2"></div><div class="dot d3"></div></div>
+          <span class="code-filename">${q.file}</span>
+          <button class="copy-btn" id="copy-${q.id}" onclick="copyCode(${q.id});event.stopPropagation()">Copy</button>
+        </div>
+        <div class="code-block">${syntaxHL(displayCode)}</div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="sec-label">Logic Breakdown</div>
+      <div class="logic-tip">${q.logic}</div>
+    </div>
+  </div>
+</div>`;
+  }).join('');
+}
+
+// Scroll top button
+window.addEventListener('scroll', ()=>{
+  document.getElementById('scrollTop').classList.toggle('show', window.scrollY > 400);
+});
+
+render();
+</script>
+</body>
+</html>
